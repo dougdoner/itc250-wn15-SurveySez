@@ -46,25 +46,77 @@ if(isset($_GET['id']) && (int)$_GET['id'] > 0){#proper data must be on querystri
     myRedirect(VIRTUAL_PATH . "surveys/surveys.php");
 }
 
-$mySurvey = new Survey($myID);
+/*
+  We know that we want results or the survey,
+  not both...
+  
+  we also know we may have no survey at all
+  
+  if result
+    show result
+  else 
+    if survey
+        show survey
+  else
+    show sorry, not survey
+  
+  if (result) {
+  }
+  else {
+    if (survey) {
+    }
+    else {
+      echo "Sorry, no survey";
+    }
+  }
+  
+*/
 
-if($mySurvey->isValid)
-{
-    $config->titleTag = $mySurvey->Title . " Survey";
+$myResult = new Result($myID);
+if($myResult->isValid) {
+	$PageTitle = "'Result to " . $myResult->Title . "' Survey!";
 }
-else //no such survey
-{
-    $config->titleTag = "No such survey";
+else {
+    $mySurvey = new Survey($myID);
+
+    if($mySurvey->isValid) {
+        $config->titleTag = $mySurvey->Title . " Survey";
+    }
+    else {
+       $config->titleTag = "No such survey"; 
+    }
 }
 
 get_header(); #defaults to theme header or header_inc.php
 ?>
 
+<h3 align="center"><?= $config->titleTag; ?></h3>
 
-    <h3 align="center"><?= $config->titleTag; ?></h3>
 <?php
-if($mySurvey->isValid)
-{
+if($myResult->isValid) {
+	$PageTitle = "'Result to " . $myResult->Title . "' Survey!";
+}
+else {
+    $mySurvey = new Survey($myID);
+
+    if($mySurvey->isValid) {
+        $config->titleTag = $mySurvey->Title . " Survey";
+    }
+    else {
+       $config->titleTag = "No such survey"; 
+    }
+}
+
+
+if($myResult->isValid) {# check to see if we have a valid SurveyID
+	echo "Survey Title: <b>" . $myResult->Title . "</b><br />";  //show data on page
+	echo "Survey Description: " . $myResult->Description . "<br />";
+	$myResult->showGraph() . "<br />";	//showTallies method shows all questions, answers and tally totals!
+	echo SurveyUtil::responseList($myID);
+    unset($myResult);  //destroy object & release resources
+}
+else {
+	if($mySurvey->isValid) {
     ?>
     <h4>Here is the survey's description</h4>
     <p><?= $mySurvey->Description; ?></p>
@@ -72,15 +124,14 @@ if($mySurvey->isValid)
     <?= SurveyUtil::responseList($myID); ?>
 
     <p><a href="surveys.php">Go back to surveys list</a></p>
-
-<?php
-}
-else //no such survey
-{
-    ?>
-    <p>Please check to see if there is a problem</p>
-    <p><a href="surveys.php">Go back to surveys list</a></p>
-<?php
+    <?php
+    }
+    else {//no such survey
+        ?>
+        <p>Please check to see if there is a problem</p>
+        <p><a href="surveys.php">Go back to surveys list</a></p>
+        <?php
+    }
 }
 
 get_footer(); #defaults to theme footer or footer_inc.php
