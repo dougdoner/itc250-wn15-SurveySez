@@ -74,7 +74,7 @@ if(isset($_GET['id']) && (int)$_GET['id'] > 0){#proper data must be on querystri
 
 $myResult = new Result($myID);
 if($myResult->isValid) {
-	$PageTitle = "'Result to " . $myResult->Title . "' Survey!";
+	$config->titleTag = "'Result to " . $myResult->Title . "' Survey!";
 }
 else {
     $mySurvey = new Survey($myID);
@@ -93,20 +93,6 @@ get_header(); #defaults to theme header or header_inc.php
 <h3 align="center"><?= $config->titleTag; ?></h3>
 
 <?php
-if($myResult->isValid) {
-	$PageTitle = "'Result to " . $myResult->Title . "' Survey!";
-}
-else {
-    $mySurvey = new Survey($myID);
-
-    if($mySurvey->isValid) {
-        $config->titleTag = $mySurvey->Title . " Survey";
-    }
-    else {
-       $config->titleTag = "No such survey"; 
-    }
-}
-
 
 if($myResult->isValid) {# check to see if we have a valid SurveyID
 	echo "Survey Title: <b>" . $myResult->Title . "</b><br />";  //show data on page
